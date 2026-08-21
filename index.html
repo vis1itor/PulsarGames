@@ -1,576 +1,1073 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PulsarGames — площадка игр</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Firebase SDK -->
-  <script type="importmap">
-    {
-      "imports": {
-        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
-        "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"
-      }
-    }
-  </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsarGames — управление играми</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+            }
+        }
+    </script>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      min-height: 100vh;
-      background: radial-gradient(circle at 30% 40%, #0b0d1a, #03040b);
-      font-family: 'Space Grotesk', sans-serif;
-      padding: 2rem 1.5rem;
-      color: #e8f0ff;
-    }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 30% 40%, #0b0d1a, #03040b);
+            font-family: 'Space Grotesk', sans-serif;
+            padding: 2rem 1.5rem;
+            color: #e8f0ff;
+        }
 
-    /* ----- ГЛАВНЫЙ КОНТЕЙНЕР ----- */
-    .app-wrapper {
-      max-width: 1280px;
-      margin: 0 auto;
-    }
+        .app-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-    /* ----- ШАПКА (liquid glass) ----- */
-    .header-glass {
-      background: rgba(20, 30, 50, 0.2);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      border-radius: 48px 16px 48px 16px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 1.8rem 2.5rem;
-      margin-bottom: 3rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1.2rem;
-      box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-      animation: glassPulse 6s infinite alternate ease-in-out;
-    }
+        /* ----- ШАПКА ----- */
+        .header-glass {
+            background: rgba(20, 30, 50, 0.2);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border-radius: 48px 16px 48px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 1.5rem 2.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.2rem;
+            box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.8);
+            animation: glassPulse 6s infinite alternate ease-in-out;
+        }
 
-    .brand {
-      display: flex;
-      align-items: baseline;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-    }
+        .brand {
+            display: flex;
+            align-items: baseline;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
 
-    .brand h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ffffff 10%, #b0d4ff 70%, #d4bfff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      filter: drop-shadow(0 4px 12px rgba(0, 20, 40, 0.6));
-      letter-spacing: 0.02em;
-    }
+        .brand h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 10%, #b0d4ff 70%, #d4bfff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-    .brand .tagline-mini {
-      font-style: italic;
-      font-weight: 300;
-      font-size: 1.1rem;
-      color: rgba(200, 220, 255, 0.6);
-      background: rgba(255,255,255,0.03);
-      padding: 0.2rem 1rem;
-      border-radius: 40px;
-      border: 1px solid rgba(255,255,255,0.04);
-    }
+        .brand .tagline-mini {
+            font-style: italic;
+            font-weight: 300;
+            font-size: 0.9rem;
+            color: rgba(200, 220, 255, 0.5);
+            background: rgba(255,255,255,0.03);
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
 
-    .auth-pill {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      background: rgba(10, 18, 34, 0.3);
-      backdrop-filter: blur(6px);
-      padding: 0.4rem 1.2rem 0.4rem 1.6rem;
-      border-radius: 60px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-    }
+        .auth-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(10, 18, 34, 0.3);
+            backdrop-filter: blur(6px);
+            padding: 0.4rem 1.2rem 0.4rem 1.6rem;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            flex-wrap: wrap;
+        }
 
-    .auth-pill .user-email {
-      font-size: 0.9rem;
-      color: #b0d4ff;
-    }
+        .auth-pill .user-email {
+            font-size: 0.9rem;
+            color: #b0d4ff;
+        }
 
-    .auth-pill .logout-btn {
-      background: rgba(255, 80, 80, 0.08);
-      border: 1px solid rgba(255, 80, 80, 0.08);
-      border-radius: 40px;
-      padding: 0.2rem 1rem;
-      font-size: 0.8rem;
-      color: rgba(255, 180, 180, 0.7);
-      cursor: pointer;
-      transition: all 0.25s;
-      font-family: inherit;
-    }
+        .auth-pill .user-role {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.8rem;
+            border-radius: 40px;
+            background: rgba(100, 180, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(200, 220, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
 
-    .auth-pill .logout-btn:hover {
-      background: rgba(255, 80, 80, 0.15);
-      border-color: rgba(255, 80, 80, 0.2);
-      color: #ffbaba;
-    }
+        .auth-pill .auth-btn {
+            background: rgba(100, 180, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 40px;
+            padding: 0.3rem 1.2rem;
+            font-size: 0.85rem;
+            color: rgba(200, 220, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+        }
 
-    /* ----- СЕТКА КАРТОЧЕК ИГР ----- */
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 2rem;
-    }
+        .auth-pill .auth-btn:hover {
+            background: rgba(100, 180, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
 
-    .game-card {
-      background: rgba(20, 30, 50, 0.2);
-      backdrop-filter: blur(12px) saturate(160%);
-      -webkit-backdrop-filter: blur(12px) saturate(160%);
-      border-radius: 32px 12px 32px 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 1.2rem 1.2rem 1.5rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.6);
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
+        .auth-pill .logout-btn {
+            background: rgba(255, 80, 80, 0.08);
+            border: 1px solid rgba(255, 80, 80, 0.08);
+            border-radius: 40px;
+            padding: 0.2rem 1rem;
+            font-size: 0.8rem;
+            color: rgba(255, 180, 180, 0.7);
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+        }
 
-    .game-card:hover {
-      transform: translateY(-6px) scale(1.01);
-      border-color: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 25px 50px -15px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(100, 180, 255, 0.05);
-    }
+        .auth-pill .logout-btn:hover {
+            background: rgba(255, 80, 80, 0.15);
+            border-color: rgba(255, 80, 80, 0.2);
+            color: #ffbaba;
+        }
 
-    .game-card .preview {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border-radius: 20px 8px 20px 8px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      color: rgba(255, 255, 255, 0.08);
-      transition: all 0.3s;
-    }
+        /* ----- СЕКЦИИ ----- */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 2rem 0 1.2rem;
+            background: linear-gradient(135deg, #ffffff, #b0d4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-    .game-card:hover .preview {
-      border-color: rgba(255, 255, 255, 0.1);
-    }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
 
-    .game-card .preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+        .game-card {
+            background: rgba(20, 30, 50, 0.2);
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            border-radius: 32px 12px 32px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
 
-    .game-card .game-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-top: 0.4rem;
-      background: linear-gradient(135deg, #f0f7ff, #b0d4ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+        .game-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
 
-    .game-card .game-developer {
-      font-size: 0.9rem;
-      font-weight: 300;
-      color: rgba(200, 215, 255, 0.5);
-      letter-spacing: 0.02em;
-    }
+        .game-card .preview {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 20px 8px 20px 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
 
-    .game-card .game-genre-tag {
-      display: inline-block;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.2rem 0.8rem;
-      border-radius: 40px;
-      background: rgba(100, 180, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      color: rgba(200, 220, 255, 0.5);
-      margin-top: 0.2rem;
-      align-self: flex-start;
-    }
+        .game-card .game-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #f0f7ff, #b0d4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-    /* ----- ОВЕРЛЕЙ (детальная страница игры) ----- */
-    .overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(3, 4, 11, 0.85);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      z-index: 1000;
-      padding: 2rem;
-      align-items: center;
-      justify-content: center;
-      animation: overlayIn 0.35s ease;
-    }
+        .game-card .game-dev {
+            font-size: 0.85rem;
+            color: rgba(200, 215, 255, 0.5);
+        }
 
-    .overlay.active {
-      display: flex;
-    }
+        .game-card .game-genre {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            background: rgba(100, 180, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: rgba(200, 220, 255, 0.5);
+            align-self: flex-start;
+        }
 
-    @keyframes overlayIn {
-      0% { opacity: 0; backdrop-filter: blur(0px); }
-      100% { opacity: 1; backdrop-filter: blur(20px); }
-    }
+        .game-card .game-status {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.8rem;
+            border-radius: 40px;
+            align-self: flex-start;
+            margin-top: 0.2rem;
+        }
 
-    .overlay-content {
-      max-width: 900px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      background: rgba(20, 30, 50, 0.25);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: 48px 16px 48px 16px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 2.5rem 2.5rem 2rem;
-      box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-      position: relative;
-    }
+        .status-pending {
+            background: rgba(255, 200, 50, 0.1);
+            border: 1px solid rgba(255, 200, 50, 0.15);
+            color: #ffd866;
+        }
 
-    .overlay-close {
-      position: absolute;
-      top: 1.2rem;
-      right: 1.8rem;
-      font-size: 2rem;
-      background: none;
-      border: none;
-      color: rgba(255, 255, 255, 0.2);
-      cursor: pointer;
-      transition: all 0.25s;
-      font-family: inherit;
-      line-height: 1;
-    }
+        .status-approved {
+            background: rgba(50, 255, 150, 0.08);
+            border: 1px solid rgba(50, 255, 150, 0.1);
+            color: #66ffaa;
+        }
 
-    .overlay-close:hover {
-      color: rgba(255, 255, 255, 0.6);
-      transform: rotate(90deg);
-    }
+        .status-rejected {
+            background: rgba(255, 80, 80, 0.08);
+            border: 1px solid rgba(255, 80, 80, 0.1);
+            color: #ff6666;
+        }
 
-    .overlay-title {
-      font-size: 2.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ffffff, #b0d4ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 0.2rem;
-    }
+        .game-card .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
 
-    .overlay-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem 2.5rem;
-      margin: 1rem 0 1.5rem;
-      font-size: 1rem;
-      color: rgba(200, 220, 255, 0.6);
-    }
+        .game-card .card-actions button {
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(200, 220, 255, 0.7);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            transition: all 0.25s;
+        }
 
-    .overlay-meta span strong {
-      color: rgba(220, 235, 255, 0.8);
-      font-weight: 400;
-    }
+        .game-card .card-actions button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+        }
 
-    .overlay-download-btn {
-      background: rgba(100, 180, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 60px;
-      padding: 0.9rem 2.8rem;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600;
-      font-size: 1.2rem;
-      letter-spacing: 0.06em;
-      color: #d0e8ff;
-      backdrop-filter: blur(8px);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      background: linear-gradient(135deg, rgba(60, 140, 255, 0.1), rgba(180, 120, 255, 0.05));
-      margin: 1rem 0 1.5rem;
-      display: inline-block;
-    }
+        .btn-approve {
+            background: rgba(50, 255, 150, 0.08) !important;
+            border-color: rgba(50, 255, 150, 0.1) !important;
+            color: #66ffaa !important;
+        }
 
-    .overlay-download-btn:hover {
-      background: rgba(100, 180, 255, 0.18);
-      border-color: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 0 40px rgba(80, 160, 255, 0.15);
-      transform: scale(1.02);
-      color: #ffffff;
-    }
+        .btn-approve:hover {
+            background: rgba(50, 255, 150, 0.15) !important;
+        }
 
-    .overlay-media {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
-      margin-top: 1.2rem;
-    }
+        .btn-reject {
+            background: rgba(255, 80, 80, 0.08) !important;
+            border-color: rgba(255, 80, 80, 0.1) !important;
+            color: #ff6666 !important;
+        }
 
-    .overlay-media .media-item {
-      aspect-ratio: 16 / 9;
-      border-radius: 20px 8px 20px 8px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.15);
-    }
+        .btn-reject:hover {
+            background: rgba(255, 80, 80, 0.15) !important;
+        }
 
-    .overlay-media .media-item img,
-    .overlay-media .media-item video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+        .btn-game-week {
+            background: rgba(255, 200, 50, 0.08) !important;
+            border-color: rgba(255, 200, 50, 0.1) !important;
+            color: #ffd866 !important;
+        }
 
-    .overlay-media .media-item.trailer {
-      grid-column: span 2;
-    }
+        .btn-game-week:hover {
+            background: rgba(255, 200, 50, 0.15) !important;
+        }
 
-    /* ----- АНИМАЦИИ ----- */
-    @keyframes glassPulse {
-      0% {
-        backdrop-filter: blur(14px) saturate(160%);
-        box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-      }
-      100% {
-        backdrop-filter: blur(20px) saturate(200%);
-        box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-      }
-    }
+        .game-card .game-week-badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.8rem;
+            border-radius: 40px;
+            background: rgba(255, 200, 50, 0.15);
+            border: 1px solid rgba(255, 200, 50, 0.2);
+            color: #ffd866;
+            align-self: flex-start;
+        }
 
-    /* ----- АДАПТИВ ----- */
-    @media (max-width: 720px) {
-      .header-glass {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 1.2rem 1.5rem;
-      }
-      .brand h1 { font-size: 1.8rem; }
-      .overlay-content { padding: 1.8rem 1.2rem; }
-      .overlay-title { font-size: 2rem; }
-      .games-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.2rem; }
-    }
+        /* ----- ФОРМА ДОБАВЛЕНИЯ ИГРЫ ----- */
+        .add-game-form {
+            background: rgba(20, 30, 50, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 40px 12px 40px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+        }
 
-    @media (max-width: 480px) {
-      .games-grid { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
-      .game-card { padding: 0.8rem; }
-      .game-card .game-title { font-size: 1rem; }
-    }
+        .add-game-form.active {
+            display: flex;
+        }
 
-    /* скролл для оверлея */
-    .overlay-content::-webkit-scrollbar {
-      width: 4px;
-    }
-    .overlay-content::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .overlay-content::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.1);
-      border-radius: 20px;
-    }
-  </style>
+        .add-game-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .add-game-form input,
+        .add-game-form textarea {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 60px;
+            padding: 0.8rem 1.4rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: #e8f0ff;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .add-game-form input:focus,
+        .add-game-form textarea:focus {
+            border-color: rgba(140, 200, 255, 0.4);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .add-game-form textarea {
+            border-radius: 24px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .add-game-form .submit-btn {
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(100, 180, 255, 0.08);
+            color: #d0e8ff;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            align-self: flex-start;
+        }
+
+        .add-game-form .submit-btn:hover {
+            background: rgba(100, 180, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ----- МОДАЛЬНОЕ ОКНО ВХОДА ----- */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 4, 11, 0.85);
+            backdrop-filter: blur(16px) saturate(180%);
+            z-index: 2000;
+            padding: 2rem;
+            align-items: center;
+            justify-content: center;
+            animation: overlayIn 0.3s ease;
+        }
+
+        .auth-modal.active {
+            display: flex;
+        }
+
+        @keyframes overlayIn {
+            0% { opacity: 0; backdrop-filter: blur(0px); }
+            100% { opacity: 1; backdrop-filter: blur(16px); }
+        }
+
+        .auth-modal-content {
+            max-width: 420px;
+            width: 100%;
+            background: rgba(20, 30, 50, 0.3);
+            backdrop-filter: blur(20px);
+            border-radius: 48px 16px 48px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 2.5rem 2rem 2rem;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9);
+            position: relative;
+        }
+
+        .auth-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 1.8rem;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+            line-height: 1;
+        }
+
+        .auth-modal-close:hover {
+            color: rgba(255, 255, 255, 0.6);
+            transform: rotate(90deg);
+        }
+
+        .auth-modal-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff, #b0d4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .auth-modal .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .auth-modal .auth-form input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 60px;
+            padding: 0.9rem 1.4rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 300;
+            color: #e8f0ff;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .auth-modal .auth-form input::placeholder {
+            color: rgba(200, 215, 255, 0.3);
+        }
+
+        .auth-modal .auth-form input:focus {
+            border-color: rgba(140, 200, 255, 0.4);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .auth-modal .form-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .auth-modal .auth-btn {
+            flex: 1;
+            min-width: 100px;
+            background: rgba(100, 180, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 60px;
+            padding: 0.8rem 1.2rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #d0e8ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-modal .auth-btn:hover {
+            background: rgba(100, 180, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        .auth-modal .auth-status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: rgba(200, 220, 255, 0.6);
+            text-align: center;
+            min-height: 2.2rem;
+        }
+
+        /* ----- АНИМАЦИИ ----- */
+        @keyframes glassPulse {
+            0% {
+                backdrop-filter: blur(14px) saturate(160%);
+                box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.8);
+            }
+            100% {
+                backdrop-filter: blur(20px) saturate(200%);
+                box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.9);
+            }
+        }
+
+        /* ----- АДАПТИВ ----- */
+        @media (max-width: 720px) {
+            .header-glass {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1.2rem 1.5rem;
+            }
+            .brand h1 { font-size: 1.6rem; }
+            .add-game-form .form-row {
+                grid-template-columns: 1fr;
+            }
+            .games-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .notification-badge {
+            background: rgba(255, 80, 80, 0.15);
+            border: 1px solid rgba(255, 80, 80, 0.15);
+            color: #ff6666;
+            padding: 0.15rem 0.6rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            margin-left: 0.3rem;
+        }
+
+        .admin-panel-toggle {
+            background: rgba(100, 180, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 40px;
+            padding: 0.3rem 1rem;
+            color: rgba(200, 220, 255, 0.5);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            transition: all 0.25s;
+        }
+
+        .admin-panel-toggle:hover {
+            background: rgba(100, 180, 255, 0.1);
+            color: #ffffff;
+        }
+    </style>
 </head>
 <body>
 
 <div class="app-wrapper">
 
-  <!-- ШАПКА -->
-  <header class="header-glass">
-    <div class="brand">
-      <h1>PulsarGames</h1>
-      <span class="tagline-mini">✦ живые игры</span>
-    </div>
-    <div class="auth-pill" id="authPill">
-      <span class="user-email" id="userEmailDisplay">Гость</span>
-      <button class="logout-btn" id="logoutBtn" style="display:none;">Выйти</button>
-    </div>
-  </header>
+    <!-- ШАПКА -->
+    <header class="header-glass">
+        <div class="brand">
+            <h1>PulsarGames</h1>
+            <span class="tagline-mini">✦ живые игры</span>
+        </div>
+        <div class="auth-pill" id="authPill">
+            <span class="user-email" id="userEmailDisplay">Гость</span>
+            <span class="user-role" id="userRoleDisplay">—</span>
+            <button class="admin-panel-toggle" id="adminPanelToggle" style="display:none;">👑 Панель</button>
+            <button class="auth-btn" id="loginBtn">Войти</button>
+            <button class="logout-btn" id="logoutBtn" style="display:none;">Выйти</button>
+        </div>
+    </header>
 
-  <!-- СЕТКА КАРТОЧЕК -->
-  <div class="games-grid" id="gamesGrid">
-    <!-- карточки генерируются js -->
-  </div>
+    <!-- ФОРМА ДОБАВЛЕНИЯ ИГРЫ (для разработчиков) -->
+    <div class="add-game-form" id="addGameForm">
+        <h3 style="font-weight:400; font-size:1.3rem;">➕ Отправить игру на проверку</h3>
+        <div class="form-row">
+            <input type="text" id="gameTitle" placeholder="Название игры" />
+            <input type="text" id="gameDeveloper" placeholder="Разработчик" />
+        </div>
+        <div class="form-row">
+            <input type="text" id="gameGenre" placeholder="Жанр" />
+            <input type="text" id="gamePreview" placeholder="Эмодзи превью (например, 🎮)" />
+        </div>
+        <textarea id="gameDescription" placeholder="Описание игры..."></textarea>
+        <button class="submit-btn" id="submitGameBtn">📤 Отправить на проверку</button>
+    </div>
+
+    <!-- ИГРЫ -->
+    <h2 class="section-title" id="gamesTitle">📚 Все игры</h2>
+    <div class="games-grid" id="gamesGrid"></div>
 
 </div>
 
-<!-- ОВЕРЛЕЙ -->
-<div class="overlay" id="gameOverlay">
-  <div class="overlay-content" id="overlayContent">
-    <button class="overlay-close" id="overlayClose">✕</button>
-    <div class="overlay-title" id="overlayTitle">Название игры</div>
-    <div class="overlay-meta" id="overlayMeta">
-      <span><strong>Разработчик:</strong> <span id="overlayDev">—</span></span>
-      <span><strong>Жанр:</strong> <span id="overlayGenre">—</span></span>
+<!-- МОДАЛЬНОЕ ОКНО ВХОДА -->
+<div class="auth-modal" id="authModal">
+    <div class="auth-modal-content">
+        <button class="auth-modal-close" id="authModalClose">✕</button>
+        <div class="auth-modal-title">⚡ Вход в Pulsar</div>
+        <form class="auth-form" id="authForm">
+            <input type="email" id="modalEmail" placeholder="Электронная почта" required />
+            <input type="password" id="modalPassword" placeholder="Пароль" required minlength="6" />
+            <div class="form-row">
+                <button type="submit" class="auth-btn" id="modalSignUpBtn">Зарегистрироваться</button>
+                <button type="button" class="auth-btn" id="modalSignInBtn">Войти</button>
+            </div>
+        </form>
+        <div class="auth-status" id="modalStatus">Войдите или создайте аккаунт</div>
     </div>
-    <button class="overlay-download-btn" id="overlayDownloadBtn">⬇ Скачать</button>
-    <div class="overlay-media" id="overlayMedia">
-      <!-- скриншоты и трейлер вставляются js -->
-    </div>
-  </div>
 </div>
 
 <script type="module">
-  import { initializeApp } from 'firebase/app';
-  import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+    import { initializeApp } from 'firebase/app';
+    import { 
+        getAuth, 
+        onAuthStateChanged, 
+        signOut,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword
+    } from 'firebase/auth';
+    import {
+        getFirestore,
+        collection,
+        addDoc,
+        query,
+        where,
+        getDocs,
+        updateDoc,
+        doc,
+        onSnapshot,
+        deleteDoc,
+        setDoc
+    } from 'firebase/firestore';
 
-  // ===== FIREBASE =====
-  const firebaseConfig = {
-    apiKey: "AIzaSyBTXrdsl_SmJkFSBRT2gvtSJ6Iw4LvULXM",
-    authDomain: "pulsargames-3ebc9.firebaseapp.com",
-    projectId: "pulsargames-3ebc9",
-    storageBucket: "pulsargames-3ebc9.firebasestorage.app",
-    messagingSenderId: "503864871102",
-    appId: "1:503864871102:web:0768bdfe18943933e976ef"
-  };
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    // ===== FIREBASE =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyBTXrdsl_SmJkFSBRT2gvtSJ6Iw4LvULXM",
+        authDomain: "pulsargames-3ebc9.firebaseapp.com",
+        projectId: "pulsargames-3ebc9",
+        storageBucket: "pulsargames-3ebc9.firebasestorage.app",
+        messagingSenderId: "503864871102",
+        appId: "1:503864871102:web:0768bdfe18943933e976ef"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  // ===== DOM =====
-  const userEmailDisplay = document.getElementById('userEmailDisplay');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const gamesGrid = document.getElementById('gamesGrid');
-  const overlay = document.getElementById('gameOverlay');
-  const overlayClose = document.getElementById('overlayClose');
-  const overlayTitle = document.getElementById('overlayTitle');
-  const overlayDev = document.getElementById('overlayDev');
-  const overlayGenre = document.getElementById('overlayGenre');
-  const overlayMedia = document.getElementById('overlayMedia');
-  const overlayDownloadBtn = document.getElementById('overlayDownloadBtn');
+    // ===== КОНСТАНТЫ =====
+    const CHIEF_EMAIL = 'voyager4vodorod@gmail.com';
+    const CHIEF_PASSWORD = 'AAAaaa123321';
 
-  // ===== ДАННЫЕ ИГР =====
-  const games = [
-    {
-      id: 1,
-      title: 'Echoes of the Void',
-      developer: 'StarForge Studios',
-      genre: 'Sci-Fi RPG',
-      preview: '🌌',
-      screenshots: ['🎮', '🪐', '🚀'],
-      trailer: '🎬'
-    },
-    {
-      id: 2,
-      title: 'Neon Drift',
-      developer: 'Phantom Pixel',
-      genre: 'Racing / Cyberpunk',
-      preview: '🏎️',
-      screenshots: ['🌃', '🏁', '💠'],
-      trailer: '🎥'
-    },
-    {
-      id: 3,
-      title: 'Crystal Saga',
-      developer: 'Moonlight Forge',
-      genre: 'Fantasy Adventure',
-      preview: '🗡️',
-      screenshots: ['🏰', '🧙', '🐉'],
-      trailer: '📽️'
-    },
-    {
-      id: 4,
-      title: 'Rust & Ruin',
-      developer: 'Wasteland Interactive',
-      genre: 'Survival / Post-Apo',
-      preview: '⚙️',
-      screenshots: ['🏜️', '🔧', '💀'],
-      trailer: '🎞️'
+    // ===== DOM =====
+    const userEmailDisplay = document.getElementById('userEmailDisplay');
+    const userRoleDisplay = document.getElementById('userRoleDisplay');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const adminPanelToggle = document.getElementById('adminPanelToggle');
+    const authModal = document.getElementById('authModal');
+    const authModalClose = document.getElementById('authModalClose');
+    const modalEmail = document.getElementById('modalEmail');
+    const modalPassword = document.getElementById('modalPassword');
+    const modalSignUpBtn = document.getElementById('modalSignUpBtn');
+    const modalSignInBtn = document.getElementById('modalSignInBtn');
+    const modalStatus = document.getElementById('modalStatus');
+    const gamesGrid = document.getElementById('gamesGrid');
+    const gamesTitle = document.getElementById('gamesTitle');
+    const addGameForm = document.getElementById('addGameForm');
+    const gameTitle = document.getElementById('gameTitle');
+    const gameDeveloper = document.getElementById('gameDeveloper');
+    const gameGenre = document.getElementById('gameGenre');
+    const gamePreview = document.getElementById('gamePreview');
+    const gameDescription = document.getElementById('gameDescription');
+    const submitGameBtn = document.getElementById('submitGameBtn');
+
+    // ===== СОСТОЯНИЕ =====
+    let currentUser = null;
+    let currentUserRole = 'guest'; // 'guest', 'developer', 'admin', 'chief'
+    let allGames = [];
+    let pendingGames = [];
+    let approvedGames = [];
+    let gameOfWeek = null;
+
+    // ===== ФУНКЦИИ РОЛЕЙ =====
+    async function determineRole(user) {
+        if (!user) return 'guest';
+        
+        // Главарь
+        if (user.email === CHIEF_EMAIL) {
+            return 'chief';
+        }
+
+        // Проверяем, есть ли пользователь в коллекции admins
+        try {
+            const adminsRef = collection(db, 'admins');
+            const q = query(adminsRef, where('email', '==', user.email));
+            const snapshot = await getDocs(q);
+            if (!snapshot.empty) {
+                return 'admin';
+            }
+        } catch (e) {
+            console.warn('Ошибка проверки админа:', e);
+        }
+
+        // Все остальные — разработчики (могут отправлять игры)
+        return 'developer';
     }
-  ];
 
-  // ===== РЕНДЕР КАРТОЧЕК =====
-  function renderGames() {
-    gamesGrid.innerHTML = games.map(game => `
-      <div class="game-card" data-id="${game.id}">
-        <div class="preview">${game.preview}</div>
-        <div class="game-title">${game.title}</div>
-        <div class="game-developer">${game.developer}</div>
-        <span class="game-genre-tag">${game.genre}</span>
-      </div>
-    `).join('');
-
-    // Клик по карточке → открыть оверлей
-    document.querySelectorAll('.game-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const id = parseInt(card.dataset.id);
-        const game = games.find(g => g.id === id);
-        if (game) openOverlay(game);
-      });
-    });
-  }
-
-  // ===== ОТКРЫТЬ ОВЕРЛЕЙ =====
-  function openOverlay(game) {
-    overlayTitle.textContent = game.title;
-    overlayDev.textContent = game.developer;
-    overlayGenre.textContent = game.genre;
-    overlayDownloadBtn.textContent = `⬇ Скачать ${game.title}`;
-
-    // Медиа: скриншоты + трейлер
-    let mediaHTML = '';
-    // скриншоты
-    game.screenshots.forEach((shot, idx) => {
-      mediaHTML += `<div class="media-item">${shot}</div>`;
-    });
-    // трейлер (занимает 2 колонки)
-    mediaHTML += `<div class="media-item trailer">🎬 трейлер: ${game.trailer}</div>`;
-
-    overlayMedia.innerHTML = mediaHTML;
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-
-  // ===== ЗАКРЫТЬ ОВЕРЛЕЙ =====
-  function closeOverlay() {
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  overlayClose.addEventListener('click', closeOverlay);
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeOverlay();
-  });
-
-  // Кнопка скачивания (заглушка)
-  overlayDownloadBtn.addEventListener('click', () => {
-    alert(`🔽 Начинается загрузка "${overlayTitle.textContent}" (демо-режим)`);
-  });
-
-  // ===== AUTH =====
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      userEmailDisplay.textContent = user.email;
-      logoutBtn.style.display = 'inline-block';
-    } else {
-      userEmailDisplay.textContent = 'Гость';
-      logoutBtn.style.display = 'none';
+    // ===== ЗАГРУЗКА ИГР =====
+    function loadGames() {
+        const gamesRef = collection(db, 'games');
+        
+        onSnapshot(gamesRef, (snapshot) => {
+            allGames = [];
+            snapshot.forEach(doc => {
+                allGames.push({ id: doc.id, ...doc.data() });
+            });
+            
+            pendingGames = allGames.filter(g => g.status === 'pending');
+            approvedGames = allGames.filter(g => g.status === 'approved');
+            gameOfWeek = allGames.find(g => g.isGameOfWeek === true);
+            
+            renderGames();
+            updateAdminPanelVisibility();
+        }, (error) => {
+            console.error('Ошибка загрузки игр:', error);
+        });
     }
-  });
 
-  logoutBtn.addEventListener('click', () => {
-    signOut(auth).catch(console.warn);
-  });
+    // ===== РЕНДЕР ИГР =====
+    function renderGames() {
+        if (!gamesGrid) return;
 
-  // ===== СТАРТ =====
-  renderGames();
+        // Показываем все игры, но с разным статусом
+        let html = '';
+        
+        if (allGames.length === 0) {
+            html = `
+                <div style="grid-column:1/-1; text-align:center; padding:3rem; color:rgba(200,220,255,0.3);">
+                    <div style="font-size:3rem; margin-bottom:1rem;">🎮</div>
+                    <p>Игр пока нет. Будьте первым разработчиком!</p>
+                </div>
+            `;
+            gamesGrid.innerHTML = html;
+            return;
+        }
+
+        // Сначала игра недели
+        if (gameOfWeek) {
+            html += renderGameCard(gameOfWeek, true);
+        }
+
+        // Одобренные игры (кроме игры недели)
+        approvedGames.forEach(game => {
+            if (!game.isGameOfWeek) {
+                html += renderGameCard(game, false);
+            }
+        });
+
+        // Игры на проверке (для админов и главаря)
+        if (currentUserRole === 'admin' || currentUserRole === 'chief') {
+            pendingGames.forEach(game => {
+                html += renderGameCard(game, false);
+            });
+        }
+
+        gamesGrid.innerHTML = html || `
+            <div style="grid-column:1/-1; text-align:center; padding:3rem; color:rgba(200,220,255,0.3);">
+                <div style="font-size:3rem; margin-bottom:1rem;">🎮</div>
+                <p>Нет доступных игр</p>
+            </div>
+        `;
+    }
+
+    function renderGameCard(game, isGameOfWeek) {
+        const statusText = {
+            'pending': '⏳ На проверке',
+            'approved': '✅ Одобрена',
+            'rejected': '❌ Отклонена'
+        };
+
+        const statusClass = {
+            'pending': 'status-pending',
+            'approved': 'status-approved',
+            'rejected': 'status-rejected'
+        };
+
+        let actionsHtml = '';
+        
+        // Админ/главарь видят кнопки для игр на проверке
+        if ((currentUserRole === 'admin' || currentUserRole === 'chief') && game.status === 'pending') {
+            actionsHtml = `
+                <div class="card-actions">
+                    <button class="btn-approve" data-id="${game.id}">✅ Одобрить</button>
+                    <button class="btn-reject" data-id="${game.id}">❌ Отклонить</button>
+                </div>
+            `;
+        }
+
+        // Главарь может назначить игрой недели
+        if (currentUserRole === 'chief' && game.status === 'approved' && !game.isGameOfWeek) {
+            actionsHtml += `
+                <div class="card-actions">
+                    <button class="btn-game-week" data-id="${game.id}">⭐ Сделать игрой недели</button>
+                </div>
+            `;
+        }
+
+        // Если это игра недели
+        const weekBadge = game.isGameOfWeek ? '<span class="game-week-badge">⭐ Игра недели</span>' : '';
+
+        return `
+            <div class="game-card">
+                <div class="preview">${game.preview || '🎮'}</div>
+                <div class="game-title">${game.title}</div>
+                <div class="game-dev">${game.developer}</div>
+                <span class="game-genre">${game.genre || 'Без жанра'}</span>
+                ${weekBadge}
+                <span class="game-status ${statusClass[game.status] || ''}">${statusText[game.status] || game.status}</span>
+                ${actionsHtml}
+            </div>
+        `;
+    }
+
+    // ===== ОБНОВЛЕНИЕ ВИДИМОСТИ ПАНЕЛЕЙ =====
+    function updateAdminPanelVisibility() {
+        if (currentUserRole === 'admin' || currentUserRole === 'chief') {
+            adminPanelToggle.style.display = 'inline-block';
+            gamesTitle.textContent = '📋 Управление играми';
+        } else {
+            adminPanelToggle.style.display = 'none';
+            gamesTitle.textContent = '📚 Все игры';
+        }
+
+        // Форма для разработчиков
+        if (currentUserRole === 'developer' || currentUserRole === 'admin' || currentUserRole === 'chief') {
+            addGameForm.classList.add('active');
+        } else {
+            addGameForm.classList.remove('active');
+        }
+    }
+
+    // ===== ОБРАБОТЧИКИ ДЕЙСТВИЙ =====
+    function setupActionHandlers() {
+        // Одобрить игру
+        document.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('btn-approve')) {
+                const gameId = e.target.dataset.id;
+                await updateDoc(doc(db, 'games', gameId), { status: 'approved' });
+                loadGames();
+            }
+
+            if (e.target.classList.contains('btn-reject')) {
+                const gameId = e.target.dataset.id;
+                await updateDoc(doc(db, 'games', gameId), { status: 'rejected' });
+                loadGames();
+            }
+
+            if (e.target.classList.contains('btn-game-week')) {
+                const gameId = e.target.dataset.id;
+                // Снимаем с других игр
+                const gamesRef = collection(db, 'games');
+                const q = query(gamesRef, where('isGameOfWeek', '==', true));
+                const snapshot = await getDocs(q);
+                snapshot.forEach(async (doc) => {
+                    await updateDoc(doc.ref, { isGameOfWeek: false });
+                });
+                // Назначаем новую
+                await updateDoc(doc(db, 'games', gameId), { isGameOfWeek: true });
+                loadGames();
+            }
+        });
+    }
+
+    // ===== ДОБАВЛЕНИЕ ИГРЫ =====
+    submitGameBtn.addEventListener('click', async () => {
+        if (!currentUser) {
+            alert('Сначала войдите в систему!');
+            return;
+        }
+
+        const title = gameTitle.value.trim();
+        const developer = gameDeveloper.value.trim();
+        const genre = gameGenre.value.trim();
+        const preview = gamePreview.value.trim() || '🎮';
+        const description = gameDescription.value.trim();
+
+        if (!title || !developer) {
+            alert('Заполните название и разработчика!');
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, 'games'), {
+                title,
+                developer,
+                genre: genre || 'Без жанра',
+                preview,
+                description,
+                status: 'pending',
+                isGameOfWeek: false,
+                submittedBy: currentUser.email,
+                submittedAt: new Date().toISOString()
+            });
+
+            alert('✅ Игра отправлена на проверку!');
+            gameTitle.value = '';
+            gameDeveloper.value = '';
+            gameGenre.value = '';
+            gamePreview.value = '';
+            gameDescription.value = '';
+            loadGames();
+        } catch (error) {
+            alert('Ошибка отправки игры: ' + error.message);
+        }
+    });
+
+    // ===== АВТОРИЗАЦИЯ =====
+    function openAuthModal() {
+        authModal.classList.add('active');
+        modalEmail.value = '';
+        modalPassword.value = '';
+        modalStatus.textContent = 'Войдите или создайте аккаунт';
+        modalStatus.style.color = 'rgba(200, 220, 255, 0.6)';
+    }
+
+    function closeAuthModal() {
+        authModal.classList.remove('active');
+    }
+
+    loginBtn.addEventListener('click', openAuthModal);
+    authModalClose.addEventListener('click', closeAuthModal);
+    authModal.addEventListener('click', (e) => {
+        if (e.target === authModal) closeAuthModal();
+    });
+
+    function setModalStatus(msg, isError = false) {
+        modalStatus.textContent = msg;
+        modalStatus.style.color = isError ? '#ffa8a8' : 'rgba(200, 220, 255, 0.8)';
+    }
+
+    // Регистрация
+    modalSignUpBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const email = modalEmail.value.trim();
+        const password = modalPassword.value.trim();
+
+        if (!email || !password) {
+            setModalStatus('Заполните все поля', true);
+            return;
+        }
+        if (password.length < 6) {
+            setModalStatus('Пароль должен быть минимум 6 символов', true);
+            return;
+        }
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            setModalStatus(`🎉 Добро пожаловать, ${userCredential.user.email}!`);
+            modalEmail.value = '';
+            modalPassword.value = '';
+            setTimeout(closeAuthModal, 1200);
+        } catch (error) {
+            let msg = error.message;
+            if (error.code === 'auth/email-already-in-use') msg = 'Этот email уже используется';
+            else if (error.code === 'auth/invalid-email') msg = 'Некорректный email';
+            else if (error.code === 'auth/weak-password') msg = 'Слишком слабый пароль';
+            setModalStatus(`❌ ${msg}`, true);
+        }
+    });
+
+    // Вход
+    modalSignInBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const email = modalEmail.value.trim();
+        const password = modalPassword.value.trim();
+
+        if (!email || !password) {
+            setModalStatus('Заполните все поля', true);
+            return;
+        }
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            setModalStatus(`🔓 Добро пожаловать, ${userCredential.user.email}!`);
+            modalEmail.value = '';
+            modalPassword.value = '';
+            setTimeout(closeAuthModal, 1200);
+        } catch (error) {
+            let msg = error.message;
+            if (error.code === 'auth/user-not-found') msg = 'Пользователь не найден';
+            else if (error.code === 'auth/wrong-password') msg = 'Неверный пароль';
+            else if (error.code === 'auth/invalid-email') msg = 'Некорректный email';
+            setModalStatus(`❌ ${msg}`, true);
+        }
+    });
+
+    // ===== ОТСЛЕЖИВАНИЕ СОСТОЯНИЯ =====
+    onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+        
+        if (user) {
+            userEmailDisplay.textContent = user.email;
+            loginBtn.style.display = 'none';
+            logoutBtn.style.display = 'inline-block';
+            
+            // Определяем роль
+            currentUserRole = await determineRole(user);
+            
+            if (currentUserRole === 'chief') {
+                userRoleDisplay.textContent = '👑 Главарь';
+                userRoleDisplay.style.color = '#ffd866';
+            } else if (currentUserRole === 'admin') {
+                userRoleDisplay.textContent = '🛡️ Администратор';
+                userRoleDisplay.style.color = '#66ffaa';
+            } else {
+                userRoleDisplay.textContent = '💻 Разработчик';
+                userRoleDisplay.style.color = '#66aaff';
+            }
+            
+            updateAdminPanelVisibility();
+            loadGames();
+        } else {
+            userEmailDisplay.textContent = 'Гость';
+            userRoleDisplay.textContent = '—';
+            userRoleDisplay.style.color = 'rgba(200, 220, 255, 0.5)';
+            loginBtn.style.display = 'inline-block';
+            logoutBtn.style.display = 'none';
+            currentUserRole = 'guest';
+            updateAdminPanelVisibility();
+            loadGames();
+        }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        signOut(auth).catch(console.warn);
+    });
+
+    // ===== ИНИЦИАЛИЗАЦИЯ =====
+    setupActionHandlers();
+    loadGames();
+
+    // Панель администратора (переключение видимости)
+    adminPanelToggle.addEventListener('click', () => {
+        const isVisible = addGameForm.classList.contains('active');
+        if (isVisible) {
+            addGameForm.classList.remove('active');
+        } else {
+            addGameForm.classList.add('active');
+        }
+    });
+
+    console.log('🚀 PulsarGames загружен!');
+    console.log('👑 Главарь: voyager4vodorod@gmail.com / AAAaaa123321');
 </script>
 
 </body>
