@@ -8,13 +8,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDK -->
     <script type="importmap">
         {
             "imports": {
                 "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
                 "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js",
+                "firebase/storage": "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"
             }
         }
     </script>
@@ -192,7 +192,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+
+        .game-card .preview img,
+        .game-card .preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .game-card .preview .placeholder {
             font-size: 3rem;
+            color: rgba(255, 255, 255, 0.1);
         }
 
         .game-card .game-title {
@@ -334,7 +347,8 @@
         }
 
         .add-game-form input,
-        .add-game-form textarea {
+        .add-game-form textarea,
+        .add-game-form select {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 60px;
@@ -345,18 +359,81 @@
             color: #e8f0ff;
             outline: none;
             transition: all 0.25s;
+            width: 100%;
         }
 
         .add-game-form input:focus,
-        .add-game-form textarea:focus {
+        .add-game-form textarea:focus,
+        .add-game-form select:focus {
             border-color: rgba(140, 200, 255, 0.4);
             background: rgba(255, 255, 255, 0.06);
+        }
+
+        .add-game-form select option {
+            background: #0b0d1a;
+            color: #e8f0ff;
         }
 
         .add-game-form textarea {
             border-radius: 24px;
             resize: vertical;
             min-height: 80px;
+        }
+
+        .add-game-form .file-input-label {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 60px;
+            padding: 0.8rem 1.4rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: rgba(200, 220, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .add-game-form .file-input-label:hover {
+            border-color: rgba(140, 200, 255, 0.3);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .add-game-form .file-input-label input {
+            display: none;
+        }
+
+        .add-game-form .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .add-game-form .file-tag {
+            background: rgba(100, 180, 255, 0.1);
+            border: 1px solid rgba(100, 180, 255, 0.15);
+            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.8rem;
+            color: rgba(200, 220, 255, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-game-form .file-tag .remove-file {
+            cursor: pointer;
+            color: rgba(255, 80, 80, 0.5);
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .add-game-form .file-tag .remove-file:hover {
+            color: #ff6666;
         }
 
         .add-game-form .submit-btn {
@@ -375,6 +452,27 @@
         .add-game-form .submit-btn:hover {
             background: rgba(100, 180, 255, 0.15);
             border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .add-game-form .upload-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .add-game-form .upload-progress.active {
+            display: block;
+        }
+
+        .add-game-form .upload-progress .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #66aaff, #b0d4ff);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
         }
 
         .auth-modal {
@@ -560,10 +658,24 @@
             border-radius: 40px;
             font-size: 0.9rem;
             display: none;
+            margin-bottom: 1rem;
         }
 
         .error-message.active {
             display: block;
+        }
+
+        .game-card .media-type-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            padding: 0.15rem 0.6rem;
+            border-radius: 40px;
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
     </style>
 </head>
@@ -585,7 +697,7 @@
         </div>
     </header>
 
-    <div class="error-message" id="errorMessage">⚠️ Ошибка: недостаточно прав</div>
+    <div class="error-message" id="errorMessage">⚠️ Ошибка</div>
 
     <div class="add-game-form" id="addGameForm">
         <h3 style="font-weight:400; font-size:1.3rem;">➕ Отправить игру на проверку</h3>
@@ -595,9 +707,25 @@
         </div>
         <div class="form-row">
             <input type="text" id="gameGenre" placeholder="Жанр" />
-            <input type="text" id="gamePreview" placeholder="Эмодзи превью (например, 🎮)" />
+            <select id="mediaType">
+                <option value="image">Изображение</option>
+                <option value="video">Видео</option>
+            </select>
         </div>
         <textarea id="gameDescription" placeholder="Описание игры..."></textarea>
+        
+        <div>
+            <label class="file-input-label">
+                📁 Выберите файл (изображение или видео)
+                <input type="file" id="gameFile" accept="image/*,video/*" />
+            </label>
+            <div class="file-list" id="fileList"></div>
+        </div>
+
+        <div class="upload-progress" id="uploadProgress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
         <button class="submit-btn" id="submitGameBtn">📤 Отправить на проверку</button>
     </div>
 
@@ -641,10 +769,15 @@
         updateDoc,
         doc,
         onSnapshot,
-        setDoc,
-        deleteDoc,
         enableIndexedDbPersistence
     } from 'firebase/firestore';
+    import {
+        getStorage,
+        ref,
+        uploadBytesResumable,
+        getDownloadURL,
+        deleteObject
+    } from 'firebase/storage';
 
     const firebaseConfig = {
         apiKey: "AIzaSyBTXrdsl_SmJkFSBRT2gvtSJ6Iw4LvULXM",
@@ -658,16 +791,15 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
-    // Включаем офлайн-поддержку
     enableIndexedDbPersistence(db).catch((err) => {
         console.warn('Офлайн-режим не включён:', err);
     });
 
     const CHIEF_EMAIL = 'voyager4vodorod@gmail.com';
-    const CHIEF_PASSWORD = 'AAAaaa123321';
 
-    // DOM
+    // DOM элементы
     const userEmailDisplay = document.getElementById('userEmailDisplay');
     const userRoleDisplay = document.getElementById('userRoleDisplay');
     const loginBtn = document.getElementById('loginBtn');
@@ -686,41 +818,39 @@
     const gameTitle = document.getElementById('gameTitle');
     const gameDeveloper = document.getElementById('gameDeveloper');
     const gameGenre = document.getElementById('gameGenre');
-    const gamePreview = document.getElementById('gamePreview');
     const gameDescription = document.getElementById('gameDescription');
+    const gameFile = document.getElementById('gameFile');
+    const fileList = document.getElementById('fileList');
+    const mediaType = document.getElementById('mediaType');
     const submitGameBtn = document.getElementById('submitGameBtn');
     const errorMessage = document.getElementById('errorMessage');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const progressBar = document.getElementById('progressBar');
 
     let currentUser = null;
     let currentUserRole = 'guest';
     let allGames = [];
+    let selectedFile = null;
 
     // ===== ОПРЕДЕЛЕНИЕ РОЛИ =====
     async function determineRole(user) {
         if (!user) return 'guest';
-        
-        if (user.email === CHIEF_EMAIL) {
-            return 'chief';
-        }
+        if (user.email === CHIEF_EMAIL) return 'chief';
 
         try {
             const adminsRef = collection(db, 'admins');
             const q = query(adminsRef, where('email', '==', user.email));
             const snapshot = await getDocs(q);
-            if (!snapshot.empty) {
-                return 'admin';
-            }
+            if (!snapshot.empty) return 'admin';
         } catch (e) {
             console.warn('Ошибка проверки админа:', e);
         }
-
         return 'developer';
     }
 
     // ===== ЗАГРУЗКА ИГР =====
     function loadGames() {
         const gamesRef = collection(db, 'games');
-        
         onSnapshot(gamesRef, (snapshot) => {
             allGames = [];
             snapshot.forEach(doc => {
@@ -754,28 +884,12 @@
         const pendingGames = allGames.filter(g => g.status === 'pending');
         const rejectedGames = allGames.filter(g => g.status === 'rejected');
 
-        // Игра недели
-        if (gameOfWeek) {
-            html += renderGameCard(gameOfWeek, true);
-        }
-
-        // Одобренные
-        approvedGames.forEach(game => {
-            html += renderGameCard(game, false);
-        });
-
-        // На проверке (только для админов и главаря)
+        if (gameOfWeek) html += renderGameCard(gameOfWeek, true);
+        approvedGames.forEach(game => html += renderGameCard(game, false));
+        
         if (currentUserRole === 'admin' || currentUserRole === 'chief') {
-            pendingGames.forEach(game => {
-                html += renderGameCard(game, false);
-            });
-        }
-
-        // Отклонённые (только для админов и главаря)
-        if (currentUserRole === 'admin' || currentUserRole === 'chief') {
-            rejectedGames.forEach(game => {
-                html += renderGameCard(game, false);
-            });
+            pendingGames.forEach(game => html += renderGameCard(game, false));
+            rejectedGames.forEach(game => html += renderGameCard(game, false));
         }
 
         gamesGrid.innerHTML = html || `
@@ -800,7 +914,6 @@
         };
 
         let actionsHtml = '';
-        
         if ((currentUserRole === 'admin' || currentUserRole === 'chief') && game.status === 'pending') {
             actionsHtml = `
                 <div class="card-actions">
@@ -819,10 +932,30 @@
         }
 
         const weekBadge = game.isGameOfWeek ? '<span class="game-week-badge">⭐ Игра недели</span>' : '';
+        const mediaBadge = game.mediaType === 'video' ? '🎬 Видео' : '🖼️ Фото';
+
+        // Превью
+        let previewHtml = '';
+        if (game.mediaUrl) {
+            if (game.mediaType === 'video') {
+                previewHtml = `
+                    <video autoplay muted loop playsinline>
+                        <source src="${game.mediaUrl}" type="video/mp4" />
+                    </video>
+                `;
+            } else {
+                previewHtml = `<img src="${game.mediaUrl}" alt="${game.title}" />`;
+            }
+        } else {
+            previewHtml = `<div class="placeholder">🎮</div>`;
+        }
 
         return `
             <div class="game-card">
-                <div class="preview">${game.preview || '🎮'}</div>
+                <div class="preview">
+                    ${previewHtml}
+                    <span class="media-type-badge">${mediaBadge}</span>
+                </div>
                 <div class="game-title">${game.title}</div>
                 <div class="game-dev">${game.developer}</div>
                 <span class="game-genre">${game.genre || 'Без жанра'}</span>
@@ -848,11 +981,9 @@
         } else {
             addGameForm.classList.remove('active');
         }
-
         hideError();
     }
 
-    // ===== ОШИБКИ =====
     function showError(msg) {
         errorMessage.textContent = '⚠️ ' + msg;
         errorMessage.classList.add('active');
@@ -862,44 +993,69 @@
         errorMessage.classList.remove('active');
     }
 
-    // ===== ОБРАБОТЧИКИ =====
-    function setupActionHandlers() {
-        document.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('btn-approve')) {
-                const gameId = e.target.dataset.id;
-                try {
-                    await updateDoc(doc(db, 'games', gameId), { status: 'approved' });
-                    loadGames();
-                } catch (err) {
-                    showError('Ошибка одобрения: ' + err.message);
-                }
-            }
+    // ===== ОБРАБОТЧИК ФАЙЛА =====
+    gameFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-            if (e.target.classList.contains('btn-reject')) {
-                const gameId = e.target.dataset.id;
-                try {
-                    await updateDoc(doc(db, 'games', gameId), { status: 'rejected' });
-                    loadGames();
-                } catch (err) {
-                    showError('Ошибка отклонения: ' + err.message);
-                }
-            }
+        const maxSize = 50 * 1024 * 1024; // 50MB
+        if (file.size > maxSize) {
+            showError('Файл слишком большой (макс. 50MB)');
+            gameFile.value = '';
+            return;
+        }
 
-            if (e.target.classList.contains('btn-game-week')) {
-                const gameId = e.target.dataset.id;
-                try {
-                    const gamesRef = collection(db, 'games');
-                    const q = query(gamesRef, where('isGameOfWeek', '==', true));
-                    const snapshot = await getDocs(q);
-                    for (const doc of snapshot.docs) {
-                        await updateDoc(doc.ref, { isGameOfWeek: false });
-                    }
-                    await updateDoc(doc(db, 'games', gameId), { isGameOfWeek: true });
-                    loadGames();
-                } catch (err) {
-                    showError('Ошибка назначения игры недели: ' + err.message);
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
+        if (!validTypes.includes(file.type)) {
+            showError('Поддерживаются только JPEG, PNG, GIF, WEBP, MP4, WEBM');
+            gameFile.value = '';
+            return;
+        }
+
+        selectedFile = file;
+        fileList.innerHTML = `
+            <span class="file-tag">
+                📎 ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)
+                <span class="remove-file" id="removeFile">✕</span>
+            </span>
+        `;
+
+        document.getElementById('removeFile')?.addEventListener('click', () => {
+            selectedFile = null;
+            gameFile.value = '';
+            fileList.innerHTML = '';
+        });
+
+        hideError();
+    });
+
+    // ===== ЗАГРУЗКА ФАЙЛА В STORAGE =====
+    async function uploadFile(gameId) {
+        if (!selectedFile) return null;
+
+        const storageRef = ref(storage, `games/${gameId}/${selectedFile.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+
+        return new Promise((resolve, reject) => {
+            uploadProgress.classList.add('active');
+            
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    progressBar.style.width = progress + '%';
+                },
+                (error) => {
+                    uploadProgress.classList.remove('active');
+                    progressBar.style.width = '0%';
+                    reject(error);
+                },
+                async () => {
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    uploadProgress.classList.remove('active');
+                    progressBar.style.width = '0%';
+                    resolve(downloadURL);
                 }
-            }
+            );
         });
     }
 
@@ -913,39 +1069,96 @@
         const title = gameTitle.value.trim();
         const developer = gameDeveloper.value.trim();
         const genre = gameGenre.value.trim();
-        const preview = gamePreview.value.trim() || '🎮';
         const description = gameDescription.value.trim();
+        const mediaTypeValue = mediaType.value;
 
         if (!title || !developer) {
             alert('Заполните название и разработчика!');
             return;
         }
 
+        if (!selectedFile) {
+            alert('Выберите файл (изображение или видео)!');
+            return;
+        }
+
         try {
-            await addDoc(collection(db, 'games'), {
+            // Сначала создаём документ игры
+            const gameData = {
                 title,
                 developer,
                 genre: genre || 'Без жанра',
-                preview,
                 description,
+                mediaType: mediaTypeValue,
                 status: 'pending',
                 isGameOfWeek: false,
                 submittedBy: currentUser.email,
-                submittedAt: new Date().toISOString()
-            });
+                submittedAt: new Date().toISOString(),
+                mediaUrl: null
+            };
+
+            const docRef = await addDoc(collection(db, 'games'), gameData);
+            const gameId = docRef.id;
+
+            // Загружаем файл
+            const mediaUrl = await uploadFile(gameId);
+            
+            // Обновляем документ с URL
+            await updateDoc(doc(db, 'games', gameId), { mediaUrl });
 
             alert('✅ Игра отправлена на проверку!');
             gameTitle.value = '';
             gameDeveloper.value = '';
             gameGenre.value = '';
-            gamePreview.value = '';
             gameDescription.value = '';
+            selectedFile = null;
+            gameFile.value = '';
+            fileList.innerHTML = '';
             loadGames();
             hideError();
         } catch (error) {
             console.error('Ошибка отправки:', error);
             showError('Ошибка отправки игры: ' + error.message);
-            alert('❌ Ошибка отправки игры. Проверьте права доступа.\n\n' + error.message);
+            alert('❌ Ошибка отправки игры: ' + error.message);
+        }
+    });
+
+    // ===== ОБРАБОТЧИКИ ДЕЙСТВИЙ =====
+    document.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('btn-approve')) {
+            const gameId = e.target.dataset.id;
+            try {
+                await updateDoc(doc(db, 'games', gameId), { status: 'approved' });
+                loadGames();
+            } catch (err) {
+                showError('Ошибка одобрения: ' + err.message);
+            }
+        }
+
+        if (e.target.classList.contains('btn-reject')) {
+            const gameId = e.target.dataset.id;
+            try {
+                await updateDoc(doc(db, 'games', gameId), { status: 'rejected' });
+                loadGames();
+            } catch (err) {
+                showError('Ошибка отклонения: ' + err.message);
+            }
+        }
+
+        if (e.target.classList.contains('btn-game-week')) {
+            const gameId = e.target.dataset.id;
+            try {
+                const gamesRef = collection(db, 'games');
+                const q = query(gamesRef, where('isGameOfWeek', '==', true));
+                const snapshot = await getDocs(q);
+                for (const doc of snapshot.docs) {
+                    await updateDoc(doc.ref, { isGameOfWeek: false });
+                }
+                await updateDoc(doc(db, 'games', gameId), { isGameOfWeek: true });
+                loadGames();
+            } catch (err) {
+                showError('Ошибка назначения игры недели: ' + err.message);
+            }
         }
     });
 
@@ -1076,13 +1289,11 @@
         }
     });
 
-    setupActionHandlers();
     loadGames();
 
     console.log('🚀 PulsarGames загружен!');
-    console.log('👑 Главарь: voyager4vodorod@gmail.com / AAAaaa123321');
-    console.log('📌 Для работы с играми необходимо настроить правила Firestore:');
-    console.log('https://console.firebase.google.com/project/pulsargames-3ebc9/firestore/rules');
+    console.log('👑 Главарь: voyager4vodorod@gmail.com');
+    console.log('📸 Теперь можно загружать изображения и видео!');
 </script>
 
 </body>
