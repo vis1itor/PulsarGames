@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PulsarGames — Liquid Glass</title>
-  <!-- Google Font для элегантного наклонного шрифта -->
+  <title>PulsarGames — площадка игр</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Firebase SDK (модули v9 compat) -->
+  <!-- Firebase SDK -->
   <script type="importmap">
     {
       "imports": {
@@ -20,7 +19,6 @@
   </script>
 
   <style>
-    /* Глобальный сброс и базовый фон */
     * {
       margin: 0;
       padding: 0;
@@ -29,255 +27,82 @@
 
     body {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       background: radial-gradient(circle at 30% 40%, #0b0d1a, #03040b);
       font-family: 'Space Grotesk', sans-serif;
-      padding: 1.5rem;
+      padding: 2rem 1.5rem;
+      color: #e8f0ff;
     }
 
-    /* Главный стеклянный контейнер — эффект жидкого стекла */
-    .glass-card {
-      position: relative;
-      max-width: 820px;
-      width: 100%;
-      padding: 3rem 2.5rem;
-      background: rgba(20, 30, 50, 0.25);
+    /* ----- ГЛАВНЫЙ КОНТЕЙНЕР ----- */
+    .app-wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* ----- ШАПКА (liquid glass) ----- */
+    .header-glass {
+      background: rgba(20, 30, 50, 0.2);
       backdrop-filter: blur(16px) saturate(180%);
       -webkit-backdrop-filter: blur(16px) saturate(180%);
-      border-radius: 64px 24px 64px 24px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 
-        0 30px 60px -20px rgba(0, 0, 0, 0.8),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
-        inset 0 0 40px rgba(120, 180, 255, 0.15);
-      transition: all 0.3s ease;
-      overflow: hidden;
-      text-align: center;
+      border-radius: 48px 16px 48px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 1.8rem 2.5rem;
+      margin-bottom: 3rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.2rem;
+      box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
       animation: glassPulse 6s infinite alternate ease-in-out;
     }
 
-    .glass-card::before {
-      content: '';
-      position: absolute;
-      top: -30%;
-      left: -20%;
-      width: 150%;
-      height: 150%;
-      background: radial-gradient(circle at 30% 50%, rgba(180, 220, 255, 0.08), transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-      animation: liquidShimmer 12s infinite alternate ease-in-out;
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      flex-wrap: wrap;
     }
 
-    .glass-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 2px;
-      background: conic-gradient(from 0deg, rgba(255,255,255,0.0), rgba(120, 180, 255, 0.2), rgba(255, 255, 255, 0.0), rgba(200, 140, 255, 0.15), rgba(255,255,255,0.0));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.6;
-    }
-
-    .content {
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Логотип / название */
-    .brand-title {
-      font-size: clamp(3.8rem, 15vw, 6.6rem);
+    .brand h1 {
+      font-size: 2.2rem;
       font-weight: 700;
-      letter-spacing: 0.04em;
-      color: #f0f7ff;
-      text-shadow: 
-        0 0 20px rgba(100, 180, 255, 0.5),
-        0 0 60px rgba(80, 140, 255, 0.2),
-        0 20px 40px rgba(0, 0, 0, 0.5);
-      margin-bottom: 0.15em;
       background: linear-gradient(135deg, #ffffff 10%, #b0d4ff 70%, #d4bfff);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       filter: drop-shadow(0 4px 12px rgba(0, 20, 40, 0.6));
-    }
-
-    /* Слоган — исправлен, убрана опечатка */
-    .tagline {
-      font-size: clamp(1.8rem, 6vw, 3.2rem);
-      font-weight: 300;
-      font-style: italic;
-      letter-spacing: 0.06em;
-      color: rgba(235, 245, 255, 0.9);
-      text-shadow: 0 0 30px rgba(70, 150, 255, 0.25), 0 8px 24px rgba(0, 0, 0, 0.4);
-      margin-bottom: 0.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: center;
-      gap: 0.3rem 0.8rem;
-      background: linear-gradient(135deg, #d0e5ff, #f0f4ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      filter: drop-shadow(0 2px 10px rgba(0, 10, 30, 0.5));
-    }
-
-    /* Акцент на слово "Живые" */
-    .tagline em {
-      font-style: italic;
-      font-weight: 600;
-      color: #b8e2ff;
-      text-shadow: 0 0 40px rgba(100, 200, 255, 0.6);
-      background: linear-gradient(135deg, #b0e0ff, #ffffff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      padding: 0 0.1em;
-    }
-
-    .liquid-divider {
-      width: 180px;
-      height: 2px;
-      margin: 1.2rem auto 0.8rem;
-      background: linear-gradient(90deg, transparent, rgba(180, 220, 255, 0.6), rgba(220, 180, 255, 0.6), transparent);
-      border-radius: 100%;
-      filter: blur(1px);
-      animation: dividerFlow 4s infinite alternate ease-in-out;
-      box-shadow: 0 0 20px rgba(120, 180, 255, 0.3);
-    }
-
-    /* ---- Стили формы регистрации (Firebase) ---- */
-    .auth-section {
-      margin-top: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.2rem;
-    }
-
-    .auth-form {
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-      background: rgba(10, 18, 34, 0.3);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      padding: 1.8rem 1.8rem 2rem;
-      border-radius: 40px 12px 40px 12px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      box-shadow: inset 0 0 30px rgba(80, 140, 255, 0.05);
-      transition: all 0.3s;
-    }
-
-    .auth-form:hover {
-      border-color: rgba(255, 255, 255, 0.08);
-      box-shadow: inset 0 0 40px rgba(80, 140, 255, 0.1);
-    }
-
-    .auth-form input {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 60px;
-      padding: 0.9rem 1.4rem;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1rem;
-      font-weight: 300;
-      color: #e8f0ff;
-      outline: none;
-      transition: all 0.25s;
-      backdrop-filter: blur(4px);
-    }
-
-    .auth-form input::placeholder {
-      color: rgba(200, 215, 255, 0.3);
-      font-weight: 300;
       letter-spacing: 0.02em;
     }
 
-    .auth-form input:focus {
-      border-color: rgba(140, 200, 255, 0.4);
-      background: rgba(255, 255, 255, 0.06);
-      box-shadow: 0 0 30px rgba(80, 160, 255, 0.1);
-    }
-
-    .auth-form .form-row {
-      display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-    }
-
-    .auth-form .form-row input {
-      flex: 1;
-      min-width: 120px;
-    }
-
-    .auth-btn {
-      background: rgba(100, 180, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 60px;
-      padding: 0.9rem 1.8rem;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600;
+    .brand .tagline-mini {
+      font-style: italic;
+      font-weight: 300;
       font-size: 1.1rem;
-      letter-spacing: 0.06em;
-      color: #d0e8ff;
-      backdrop-filter: blur(8px);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 20px rgba(80, 140, 255, 0.05);
-      margin-top: 0.2rem;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, rgba(60, 140, 255, 0.1), rgba(180, 120, 255, 0.05));
-    }
-
-    .auth-btn:hover {
-      background: rgba(100, 180, 255, 0.18);
-      border-color: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 0 40px rgba(80, 160, 255, 0.15);
-      transform: scale(1.02);
-      color: #ffffff;
-    }
-
-    .auth-btn:active {
-      transform: scale(0.97);
-    }
-
-    .auth-status {
-      font-size: 0.95rem;
-      color: rgba(200, 220, 255, 0.7);
-      background: rgba(0, 0, 0, 0.2);
-      padding: 0.4rem 1.2rem;
+      color: rgba(200, 220, 255, 0.6);
+      background: rgba(255,255,255,0.03);
+      padding: 0.2rem 1rem;
       border-radius: 40px;
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.02);
-      min-height: 2.8rem;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .auth-pill {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-      width: 100%;
-      max-width: 400px;
-      transition: all 0.3s;
+      gap: 0.8rem;
+      background: rgba(10, 18, 34, 0.3);
+      backdrop-filter: blur(6px);
+      padding: 0.4rem 1.2rem 0.4rem 1.6rem;
+      border-radius: 60px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
     }
 
-    .auth-status .user-email {
+    .auth-pill .user-email {
+      font-size: 0.9rem;
       color: #b0d4ff;
-      font-weight: 400;
-      text-shadow: 0 0 20px rgba(80, 160, 255, 0.2);
     }
 
-    .auth-status .logout-btn {
+    .auth-pill .logout-btn {
       background: rgba(255, 80, 80, 0.08);
       border: 1px solid rgba(255, 80, 80, 0.08);
       border-radius: 40px;
@@ -287,180 +112,327 @@
       cursor: pointer;
       transition: all 0.25s;
       font-family: inherit;
-      backdrop-filter: blur(4px);
     }
 
-    .auth-status .logout-btn:hover {
+    .auth-pill .logout-btn:hover {
       background: rgba(255, 80, 80, 0.15);
       border-color: rgba(255, 80, 80, 0.2);
       color: #ffbaba;
     }
 
-    /* Анимации */
+    /* ----- СЕТКА КАРТОЧЕК ИГР ----- */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 2rem;
+    }
+
+    .game-card {
+      background: rgba(20, 30, 50, 0.2);
+      backdrop-filter: blur(12px) saturate(160%);
+      -webkit-backdrop-filter: blur(12px) saturate(160%);
+      border-radius: 32px 12px 32px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.2rem 1.2rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .game-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px -15px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(100, 180, 255, 0.05);
+    }
+
+    .game-card .preview {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 20px 8px 20px 8px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: rgba(255, 255, 255, 0.08);
+      transition: all 0.3s;
+    }
+
+    .game-card:hover .preview {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .game-card .preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .game-card .game-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-top: 0.4rem;
+      background: linear-gradient(135deg, #f0f7ff, #b0d4ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .game-card .game-developer {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: rgba(200, 215, 255, 0.5);
+      letter-spacing: 0.02em;
+    }
+
+    .game-card .game-genre-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      background: rgba(100, 180, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      color: rgba(200, 220, 255, 0.5);
+      margin-top: 0.2rem;
+      align-self: flex-start;
+    }
+
+    /* ----- ОВЕРЛЕЙ (детальная страница игры) ----- */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 4, 11, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      z-index: 1000;
+      padding: 2rem;
+      align-items: center;
+      justify-content: center;
+      animation: overlayIn 0.35s ease;
+    }
+
+    .overlay.active {
+      display: flex;
+    }
+
+    @keyframes overlayIn {
+      0% { opacity: 0; backdrop-filter: blur(0px); }
+      100% { opacity: 1; backdrop-filter: blur(20px); }
+    }
+
+    .overlay-content {
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: rgba(20, 30, 50, 0.25);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 48px 16px 48px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 2.5rem 2.5rem 2rem;
+      box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      position: relative;
+    }
+
+    .overlay-close {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.8rem;
+      font-size: 2rem;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.25s;
+      font-family: inherit;
+      line-height: 1;
+    }
+
+    .overlay-close:hover {
+      color: rgba(255, 255, 255, 0.6);
+      transform: rotate(90deg);
+    }
+
+    .overlay-title {
+      font-size: 2.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff, #b0d4ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.2rem;
+    }
+
+    .overlay-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem 2.5rem;
+      margin: 1rem 0 1.5rem;
+      font-size: 1rem;
+      color: rgba(200, 220, 255, 0.6);
+    }
+
+    .overlay-meta span strong {
+      color: rgba(220, 235, 255, 0.8);
+      font-weight: 400;
+    }
+
+    .overlay-download-btn {
+      background: rgba(100, 180, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 60px;
+      padding: 0.9rem 2.8rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+      letter-spacing: 0.06em;
+      color: #d0e8ff;
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, rgba(60, 140, 255, 0.1), rgba(180, 120, 255, 0.05));
+      margin: 1rem 0 1.5rem;
+      display: inline-block;
+    }
+
+    .overlay-download-btn:hover {
+      background: rgba(100, 180, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 40px rgba(80, 160, 255, 0.15);
+      transform: scale(1.02);
+      color: #ffffff;
+    }
+
+    .overlay-media {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1.2rem;
+    }
+
+    .overlay-media .media-item {
+      aspect-ratio: 16 / 9;
+      border-radius: 20px 8px 20px 8px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.15);
+    }
+
+    .overlay-media .media-item img,
+    .overlay-media .media-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .overlay-media .media-item.trailer {
+      grid-column: span 2;
+    }
+
+    /* ----- АНИМАЦИИ ----- */
     @keyframes glassPulse {
       0% {
         backdrop-filter: blur(14px) saturate(160%);
-        -webkit-backdrop-filter: blur(14px) saturate(160%);
-        box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.03), inset 0 0 40px rgba(100, 160, 255, 0.1);
+        box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
       }
       100% {
         backdrop-filter: blur(20px) saturate(200%);
-        -webkit-backdrop-filter: blur(20px) saturate(200%);
-        box-shadow: 0 40px 80px -10px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 0 60px rgba(140, 200, 255, 0.25);
+        box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
       }
     }
 
-    @keyframes liquidShimmer {
-      0% {
-        transform: translateX(-10%) translateY(-5%) scale(1) rotate(0deg);
-        opacity: 0.3;
-      }
-      50% {
-        opacity: 0.8;
-        transform: translateX(5%) translateY(8%) scale(1.2) rotate(2deg);
-      }
-      100% {
-        transform: translateX(-5%) translateY(-8%) scale(1.1) rotate(-2deg);
-        opacity: 0.5;
-      }
-    }
-
-    @keyframes dividerFlow {
-      0% {
-        width: 120px;
-        opacity: 0.4;
-        transform: scaleX(0.8);
-      }
-      100% {
-        width: 240px;
-        opacity: 1;
-        transform: scaleX(1);
-      }
-    }
-
-    /* Пузырьки */
-    .bubble {
-      position: absolute;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.05), rgba(200, 230, 255, 0.02));
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.02);
-      pointer-events: none;
-      z-index: 0;
-      animation: floatBubble 14s infinite alternate ease-in-out;
-    }
-
-    .bubble-1 {
-      width: 120px;
-      height: 120px;
-      top: -20px;
-      right: -20px;
-      animation-duration: 18s;
-    }
-
-    .bubble-2 {
-      width: 80px;
-      height: 80px;
-      bottom: 10px;
-      left: 10px;
-      animation-duration: 22s;
-      animation-delay: -4s;
-    }
-
-    .bubble-3 {
-      width: 50px;
-      height: 50px;
-      top: 30%;
-      left: 5%;
-      animation-duration: 16s;
-      animation-delay: -8s;
-    }
-
-    @keyframes floatBubble {
-      0% { transform: translate(0, 0) scale(1); opacity: 0.2; }
-      50% { transform: translate(20px, -30px) scale(1.3); opacity: 0.5; }
-      100% { transform: translate(-10px, 20px) scale(0.9); opacity: 0.15; }
-    }
-
-    /* Адаптив */
-    @media (max-width: 600px) {
-      .glass-card {
-        padding: 2rem 1.2rem;
-        border-radius: 48px 16px 48px 16px;
-      }
-      .tagline {
+    /* ----- АДАПТИВ ----- */
+    @media (max-width: 720px) {
+      .header-glass {
         flex-direction: column;
-        gap: 0.1rem;
+        align-items: stretch;
+        padding: 1.2rem 1.5rem;
       }
-      .auth-form .form-row {
-        flex-direction: column;
-      }
-    }
-    @media (max-width: 420px) {
-      .glass-card { padding: 1.5rem 0.8rem; }
-      .brand-title { font-size: 3.2rem; }
-      .tagline { font-size: 1.6rem; }
+      .brand h1 { font-size: 1.8rem; }
+      .overlay-content { padding: 1.8rem 1.2rem; }
+      .overlay-title { font-size: 2rem; }
+      .games-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.2rem; }
     }
 
-    .glass-card:hover {
-      transform: scale(1.01) translateY(-4px);
-      transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-      box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 0 80px rgba(120, 180, 255, 0.2);
+    @media (max-width: 480px) {
+      .games-grid { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+      .game-card { padding: 0.8rem; }
+      .game-card .game-title { font-size: 1rem; }
+    }
+
+    /* скролл для оверлея */
+    .overlay-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    .overlay-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .overlay-content::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
     }
   </style>
 </head>
 <body>
 
-<div class="glass-card">
-  <!-- декоративные пузырьки -->
-  <div class="bubble bubble-1"></div>
-  <div class="bubble bubble-2"></div>
-  <div class="bubble bubble-3"></div>
+<div class="app-wrapper">
 
-  <div class="content">
-    <!-- Название -->
-    <h1 class="brand-title">PulsarGames</h1>
-
-    <!-- Слоган — исправлен, убрана опечатка -->
-    <div class="tagline">
-      <span>Pulsar.</span>
-      <span><em>Живые</em></span>
-      <span>игры</span>
+  <!-- ШАПКА -->
+  <header class="header-glass">
+    <div class="brand">
+      <h1>PulsarGames</h1>
+      <span class="tagline-mini">✦ живые игры</span>
     </div>
+    <div class="auth-pill" id="authPill">
+      <span class="user-email" id="userEmailDisplay">Гость</span>
+      <button class="logout-btn" id="logoutBtn" style="display:none;">Выйти</button>
+    </div>
+  </header>
 
-    <div class="liquid-divider"></div>
+  <!-- СЕТКА КАРТОЧЕК -->
+  <div class="games-grid" id="gamesGrid">
+    <!-- карточки генерируются js -->
+  </div>
 
-    <!-- ===== БЛОК РЕГИСТРАЦИИ FIREBASE ===== -->
-    <div class="auth-section" id="authSection">
-      <!-- Форма регистрации / входа -->
-      <form class="auth-form" id="authForm">
-        <input type="email" id="emailInput" placeholder="Электронная почта" required />
-        <input type="password" id="passwordInput" placeholder="Пароль (минимум 6 символов)" required minlength="6" />
-        <div class="form-row">
-          <button type="submit" class="auth-btn" id="signUpBtn">Зарегистрироваться</button>
-          <button type="button" class="auth-btn" id="signInBtn">Войти</button>
-        </div>
-      </form>
+</div>
 
-      <!-- Статус / информация о пользователе -->
-      <div class="auth-status" id="authStatus">
-        <span>⚡ Войдите или создайте аккаунт</span>
-      </div>
+<!-- ОВЕРЛЕЙ -->
+<div class="overlay" id="gameOverlay">
+  <div class="overlay-content" id="overlayContent">
+    <button class="overlay-close" id="overlayClose">✕</button>
+    <div class="overlay-title" id="overlayTitle">Название игры</div>
+    <div class="overlay-meta" id="overlayMeta">
+      <span><strong>Разработчик:</strong> <span id="overlayDev">—</span></span>
+      <span><strong>Жанр:</strong> <span id="overlayGenre">—</span></span>
+    </div>
+    <button class="overlay-download-btn" id="overlayDownloadBtn">⬇ Скачать</button>
+    <div class="overlay-media" id="overlayMedia">
+      <!-- скриншоты и трейлер вставляются js -->
     </div>
   </div>
 </div>
 
 <script type="module">
-  // ===== ИНИЦИАЛИЗАЦИЯ FIREBASE =====
   import { initializeApp } from 'firebase/app';
-  import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut
-  } from 'firebase/auth';
+  import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 
+  // ===== FIREBASE =====
   const firebaseConfig = {
     apiKey: "AIzaSyBTXrdsl_SmJkFSBRT2gvtSJ6Iw4LvULXM",
     authDomain: "pulsargames-3ebc9.firebaseapp.com",
@@ -469,115 +441,136 @@
     messagingSenderId: "503864871102",
     appId: "1:503864871102:web:0768bdfe18943933e976ef"
   };
-
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // ===== ЭЛЕМЕНТЫ DOM =====
-  const emailInput = document.getElementById('emailInput');
-  const passwordInput = document.getElementById('passwordInput');
-  const signUpBtn = document.getElementById('signUpBtn');
-  const signInBtn = document.getElementById('signInBtn');
-  const authStatus = document.getElementById('authStatus');
+  // ===== DOM =====
+  const userEmailDisplay = document.getElementById('userEmailDisplay');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const gamesGrid = document.getElementById('gamesGrid');
+  const overlay = document.getElementById('gameOverlay');
+  const overlayClose = document.getElementById('overlayClose');
+  const overlayTitle = document.getElementById('overlayTitle');
+  const overlayDev = document.getElementById('overlayDev');
+  const overlayGenre = document.getElementById('overlayGenre');
+  const overlayMedia = document.getElementById('overlayMedia');
+  const overlayDownloadBtn = document.getElementById('overlayDownloadBtn');
 
-  // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
-  function setStatus(message, isError = false) {
-    authStatus.innerHTML = message;
-    authStatus.style.color = isError ? '#ffa8a8' : 'rgba(200, 220, 255, 0.7)';
-  }
-
-  function renderAuthState(user) {
-    if (user) {
-      // Пользователь авторизован
-      setStatus(`
-        <span>✅ Вы вошли как</span>
-        <span class="user-email">${user.email}</span>
-        <button class="logout-btn" id="logoutBtn">Выйти</button>
-      `);
-      // добавим обработчик на кнопку выхода
-      const logoutBtn = document.getElementById('logoutBtn');
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-          signOut(auth)
-            .then(() => {
-              setStatus('👋 Вы вышли из системы');
-            })
-            .catch((error) => {
-              setStatus(`Ошибка выхода: ${error.message}`, true);
-            });
-        });
-      }
-    } else {
-      // Пользователь не авторизован
-      setStatus('⚡ Войдите или создайте аккаунт');
+  // ===== ДАННЫЕ ИГР =====
+  const games = [
+    {
+      id: 1,
+      title: 'Echoes of the Void',
+      developer: 'StarForge Studios',
+      genre: 'Sci-Fi RPG',
+      preview: '🌌',
+      screenshots: ['🎮', '🪐', '🚀'],
+      trailer: '🎬'
+    },
+    {
+      id: 2,
+      title: 'Neon Drift',
+      developer: 'Phantom Pixel',
+      genre: 'Racing / Cyberpunk',
+      preview: '🏎️',
+      screenshots: ['🌃', '🏁', '💠'],
+      trailer: '🎥'
+    },
+    {
+      id: 3,
+      title: 'Crystal Saga',
+      developer: 'Moonlight Forge',
+      genre: 'Fantasy Adventure',
+      preview: '🗡️',
+      screenshots: ['🏰', '🧙', '🐉'],
+      trailer: '📽️'
+    },
+    {
+      id: 4,
+      title: 'Rust & Ruin',
+      developer: 'Wasteland Interactive',
+      genre: 'Survival / Post-Apo',
+      preview: '⚙️',
+      screenshots: ['🏜️', '🔧', '💀'],
+      trailer: '🎞️'
     }
+  ];
+
+  // ===== РЕНДЕР КАРТОЧЕК =====
+  function renderGames() {
+    gamesGrid.innerHTML = games.map(game => `
+      <div class="game-card" data-id="${game.id}">
+        <div class="preview">${game.preview}</div>
+        <div class="game-title">${game.title}</div>
+        <div class="game-developer">${game.developer}</div>
+        <span class="game-genre-tag">${game.genre}</span>
+      </div>
+    `).join('');
+
+    // Клик по карточке → открыть оверлей
+    document.querySelectorAll('.game-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = parseInt(card.dataset.id);
+        const game = games.find(g => g.id === id);
+        if (game) openOverlay(game);
+      });
+    });
   }
 
-  // ===== ОТСЛЕЖИВАНИЕ СОСТОЯНИЯ АУТЕНТИФИКАЦИИ =====
+  // ===== ОТКРЫТЬ ОВЕРЛЕЙ =====
+  function openOverlay(game) {
+    overlayTitle.textContent = game.title;
+    overlayDev.textContent = game.developer;
+    overlayGenre.textContent = game.genre;
+    overlayDownloadBtn.textContent = `⬇ Скачать ${game.title}`;
+
+    // Медиа: скриншоты + трейлер
+    let mediaHTML = '';
+    // скриншоты
+    game.screenshots.forEach((shot, idx) => {
+      mediaHTML += `<div class="media-item">${shot}</div>`;
+    });
+    // трейлер (занимает 2 колонки)
+    mediaHTML += `<div class="media-item trailer">🎬 трейлер: ${game.trailer}</div>`;
+
+    overlayMedia.innerHTML = mediaHTML;
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // ===== ЗАКРЫТЬ ОВЕРЛЕЙ =====
+  function closeOverlay() {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  overlayClose.addEventListener('click', closeOverlay);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeOverlay();
+  });
+
+  // Кнопка скачивания (заглушка)
+  overlayDownloadBtn.addEventListener('click', () => {
+    alert(`🔽 Начинается загрузка "${overlayTitle.textContent}" (демо-режим)`);
+  });
+
+  // ===== AUTH =====
   onAuthStateChanged(auth, (user) => {
-    renderAuthState(user);
+    if (user) {
+      userEmailDisplay.textContent = user.email;
+      logoutBtn.style.display = 'inline-block';
+    } else {
+      userEmailDisplay.textContent = 'Гость';
+      logoutBtn.style.display = 'none';
+    }
   });
 
-  // ===== РЕГИСТРАЦИЯ =====
-  signUpBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    if (!email || !password) {
-      setStatus('Заполните все поля', true);
-      return;
-    }
-    if (password.length < 6) {
-      setStatus('Пароль должен быть минимум 6 символов', true);
-      return;
-    }
-
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        setStatus(`🎉 Добро пожаловать, ${user.email}!`);
-        emailInput.value = '';
-        passwordInput.value = '';
-      })
-      .catch((error) => {
-        let msg = error.message;
-        if (error.code === 'auth/email-already-in-use') msg = 'Этот email уже используется';
-        else if (error.code === 'auth/invalid-email') msg = 'Некорректный email';
-        else if (error.code === 'auth/weak-password') msg = 'Слишком слабый пароль';
-        setStatus(`❌ ${msg}`, true);
-      });
+  logoutBtn.addEventListener('click', () => {
+    signOut(auth).catch(console.warn);
   });
 
-  // ===== ВХОД =====
-  signInBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    if (!email || !password) {
-      setStatus('Заполните все поля', true);
-      return;
-    }
-
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        setStatus(`🔓 Добро пожаловать, ${user.email}!`);
-        emailInput.value = '';
-        passwordInput.value = '';
-      })
-      .catch((error) => {
-        let msg = error.message;
-        if (error.code === 'auth/user-not-found') msg = 'Пользователь не найден';
-        else if (error.code === 'auth/wrong-password') msg = 'Неверный пароль';
-        else if (error.code === 'auth/invalid-email') msg = 'Некорректный email';
-        setStatus(`❌ ${msg}`, true);
-      });
-  });
-
-  // небольшая "защита" от отправки формы по Enter (чтобы не дублировать)
-  document.getElementById('authForm').addEventListener('submit', (e) => e.preventDefault());
+  // ===== СТАРТ =====
+  renderGames();
 </script>
 
 </body>
