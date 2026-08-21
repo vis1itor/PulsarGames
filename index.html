@@ -13,8 +13,7 @@
             "imports": {
                 "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
                 "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js",
-                "firebase/storage": "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
             }
         }
     </script>
@@ -380,62 +379,6 @@
             min-height: 80px;
         }
 
-        .add-game-form .file-input-label {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 60px;
-            padding: 0.8rem 1.4rem;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 300;
-            color: rgba(200, 220, 255, 0.5);
-            cursor: pointer;
-            transition: all 0.25s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            justify-content: center;
-        }
-
-        .add-game-form .file-input-label:hover {
-            border-color: rgba(140, 200, 255, 0.3);
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .add-game-form .file-input-label input {
-            display: none;
-        }
-
-        .add-game-form .file-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            padding: 0.5rem 0;
-        }
-
-        .add-game-form .file-tag {
-            background: rgba(100, 180, 255, 0.1);
-            border: 1px solid rgba(100, 180, 255, 0.15);
-            border-radius: 40px;
-            padding: 0.2rem 0.8rem;
-            font-size: 0.8rem;
-            color: rgba(200, 220, 255, 0.7);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .add-game-form .file-tag .remove-file {
-            cursor: pointer;
-            color: rgba(255, 80, 80, 0.5);
-            font-size: 1rem;
-            line-height: 1;
-        }
-
-        .add-game-form .file-tag .remove-file:hover {
-            color: #ff6666;
-        }
-
         .add-game-form .submit-btn {
             padding: 0.8rem 2rem;
             border-radius: 60px;
@@ -452,27 +395,6 @@
         .add-game-form .submit-btn:hover {
             background: rgba(100, 180, 255, 0.15);
             border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .add-game-form .upload-progress {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-            overflow: hidden;
-            display: none;
-        }
-
-        .add-game-form .upload-progress.active {
-            display: block;
-        }
-
-        .add-game-form .upload-progress .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #66aaff, #b0d4ff);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-            width: 0%;
         }
 
         .auth-modal {
@@ -665,17 +587,14 @@
             display: block;
         }
 
-        .game-card .media-type-badge {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
+        .demo-badge {
+            font-size: 0.6rem;
             padding: 0.15rem 0.6rem;
             border-radius: 40px;
-            font-size: 0.6rem;
-            color: rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(100, 180, 255, 0.1);
+            border: 1px solid rgba(100, 180, 255, 0.1);
+            color: rgba(200, 220, 255, 0.4);
+            align-self: flex-start;
         }
     </style>
 </head>
@@ -712,20 +631,8 @@
                 <option value="video">Видео</option>
             </select>
         </div>
+        <input type="text" id="mediaUrl" placeholder="Ссылка на изображение или видео (URL)" />
         <textarea id="gameDescription" placeholder="Описание игры..."></textarea>
-        
-        <div>
-            <label class="file-input-label">
-                📁 Выберите файл (изображение или видео)
-                <input type="file" id="gameFile" accept="image/*,video/*" />
-            </label>
-            <div class="file-list" id="fileList"></div>
-        </div>
-
-        <div class="upload-progress" id="uploadProgress">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-
         <button class="submit-btn" id="submitGameBtn">📤 Отправить на проверку</button>
     </div>
 
@@ -771,13 +678,6 @@
         onSnapshot,
         enableIndexedDbPersistence
     } from 'firebase/firestore';
-    import {
-        getStorage,
-        ref,
-        uploadBytesResumable,
-        getDownloadURL,
-        deleteObject
-    } from 'firebase/storage';
 
     const firebaseConfig = {
         apiKey: "AIzaSyBTXrdsl_SmJkFSBRT2gvtSJ6Iw4LvULXM",
@@ -791,7 +691,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     enableIndexedDbPersistence(db).catch((err) => {
         console.warn('Офлайн-режим не включён:', err);
@@ -819,18 +718,58 @@
     const gameDeveloper = document.getElementById('gameDeveloper');
     const gameGenre = document.getElementById('gameGenre');
     const gameDescription = document.getElementById('gameDescription');
-    const gameFile = document.getElementById('gameFile');
-    const fileList = document.getElementById('fileList');
+    const mediaUrl = document.getElementById('mediaUrl');
     const mediaType = document.getElementById('mediaType');
     const submitGameBtn = document.getElementById('submitGameBtn');
     const errorMessage = document.getElementById('errorMessage');
-    const uploadProgress = document.getElementById('uploadProgress');
-    const progressBar = document.getElementById('progressBar');
 
     let currentUser = null;
     let currentUserRole = 'guest';
     let allGames = [];
-    let selectedFile = null;
+
+    // ===== ДЕМО-ИГРЫ ДЛЯ ТЕСТА =====
+    const demoGames = [
+        {
+            title: 'Cyberpunk 2077',
+            developer: 'CD Projekt Red',
+            genre: 'RPG / Action',
+            mediaType: 'image',
+            mediaUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600',
+            description: 'Откройте для себя историю в мире будущего.',
+            status: 'approved',
+            isGameOfWeek: true
+        },
+        {
+            title: 'The Witcher 3',
+            developer: 'CD Projekt Red',
+            genre: 'RPG',
+            mediaType: 'image',
+            mediaUrl: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=600',
+            description: 'Станьте ведьмаком в огромном открытом мире.',
+            status: 'approved',
+            isGameOfWeek: false
+        },
+        {
+            title: 'Elden Ring',
+            developer: 'FromSoftware',
+            genre: 'Action RPG',
+            mediaType: 'image',
+            mediaUrl: 'https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=600',
+            description: 'Восстаньте, потерявший свет, и направляйтесь к Кольцу.',
+            status: 'pending',
+            isGameOfWeek: false
+        },
+        {
+            title: 'God of War Ragnarok',
+            developer: 'Santa Monica Studio',
+            genre: 'Action / Adventure',
+            mediaType: 'image',
+            mediaUrl: 'https://images.unsplash.com/photo-1592155931584-901ac15763e3?w=600',
+            description: 'Путешествие Кратоса и Атрея продолжается.',
+            status: 'approved',
+            isGameOfWeek: false
+        }
+    ];
 
     // ===== ОПРЕДЕЛЕНИЕ РОЛИ =====
     async function determineRole(user) {
@@ -851,7 +790,14 @@
     // ===== ЗАГРУЗКА ИГР =====
     function loadGames() {
         const gamesRef = collection(db, 'games');
+        
         onSnapshot(gamesRef, (snapshot) => {
+            if (snapshot.empty) {
+                // Если игр нет, загружаем демо
+                loadDemoGames();
+                return;
+            }
+            
             allGames = [];
             snapshot.forEach(doc => {
                 allGames.push({ id: doc.id, ...doc.data() });
@@ -860,8 +806,35 @@
             updateUI();
         }, (error) => {
             console.error('Ошибка загрузки игр:', error);
-            showError('Ошибка загрузки игр: ' + error.message);
+            // Если ошибка, показываем демо
+            loadDemoGames();
         });
+    }
+
+    // ===== ЗАГРУЗКА ДЕМО-ИГР =====
+    async function loadDemoGames() {
+        try {
+            // Проверяем, есть ли уже игры в Firestore
+            const gamesRef = collection(db, 'games');
+            const snapshot = await getDocs(gamesRef);
+            
+            if (snapshot.empty) {
+                // Добавляем демо-игры
+                for (const game of demoGames) {
+                    await addDoc(collection(db, 'games'), game);
+                }
+                console.log('✅ Демо-игры добавлены в Firestore');
+            }
+            
+            // Перезагружаем
+            loadGames();
+        } catch (error) {
+            console.error('Ошибка загрузки демо:', error);
+            // Показываем локальные демо
+            allGames = demoGames.map((g, i) => ({ id: `demo-${i}`, ...g }));
+            renderGames();
+            updateUI();
+        }
     }
 
     // ===== РЕНДЕР ИГР =====
@@ -872,7 +845,7 @@
             gamesGrid.innerHTML = `
                 <div style="grid-column:1/-1; text-align:center; padding:3rem; color:rgba(200,220,255,0.3);">
                     <div style="font-size:3rem; margin-bottom:1rem;">🎮</div>
-                    <p>Игр пока нет. Будьте первым разработчиком!</p>
+                    <p>Игр пока нет. Добавьте первую игру!</p>
                 </div>
             `;
             return;
@@ -933,8 +906,8 @@
 
         const weekBadge = game.isGameOfWeek ? '<span class="game-week-badge">⭐ Игра недели</span>' : '';
         const mediaBadge = game.mediaType === 'video' ? '🎬 Видео' : '🖼️ Фото';
+        const isDemo = game.id && game.id.toString().startsWith('demo-') ? '<span class="demo-badge">📌 Демо</span>' : '';
 
-        // Превью
         let previewHtml = '';
         if (game.mediaUrl) {
             if (game.mediaType === 'video') {
@@ -954,12 +927,13 @@
             <div class="game-card">
                 <div class="preview">
                     ${previewHtml}
-                    <span class="media-type-badge">${mediaBadge}</span>
+                    <span class="media-type-badge" style="position:absolute;top:0.5rem;right:0.5rem;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);padding:0.15rem 0.6rem;border-radius:40px;font-size:0.6rem;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.05);">${mediaBadge}</span>
                 </div>
                 <div class="game-title">${game.title}</div>
                 <div class="game-dev">${game.developer}</div>
                 <span class="game-genre">${game.genre || 'Без жанра'}</span>
                 ${weekBadge}
+                ${isDemo}
                 <span class="game-status ${statusClass[game.status] || ''}">${statusText[game.status] || game.status}</span>
                 ${actionsHtml}
             </div>
@@ -993,72 +967,6 @@
         errorMessage.classList.remove('active');
     }
 
-    // ===== ОБРАБОТЧИК ФАЙЛА =====
-    gameFile.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const maxSize = 50 * 1024 * 1024; // 50MB
-        if (file.size > maxSize) {
-            showError('Файл слишком большой (макс. 50MB)');
-            gameFile.value = '';
-            return;
-        }
-
-        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
-        if (!validTypes.includes(file.type)) {
-            showError('Поддерживаются только JPEG, PNG, GIF, WEBP, MP4, WEBM');
-            gameFile.value = '';
-            return;
-        }
-
-        selectedFile = file;
-        fileList.innerHTML = `
-            <span class="file-tag">
-                📎 ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)
-                <span class="remove-file" id="removeFile">✕</span>
-            </span>
-        `;
-
-        document.getElementById('removeFile')?.addEventListener('click', () => {
-            selectedFile = null;
-            gameFile.value = '';
-            fileList.innerHTML = '';
-        });
-
-        hideError();
-    });
-
-    // ===== ЗАГРУЗКА ФАЙЛА В STORAGE =====
-    async function uploadFile(gameId) {
-        if (!selectedFile) return null;
-
-        const storageRef = ref(storage, `games/${gameId}/${selectedFile.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, selectedFile);
-
-        return new Promise((resolve, reject) => {
-            uploadProgress.classList.add('active');
-            
-            uploadTask.on('state_changed',
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    progressBar.style.width = progress + '%';
-                },
-                (error) => {
-                    uploadProgress.classList.remove('active');
-                    progressBar.style.width = '0%';
-                    reject(error);
-                },
-                async () => {
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                    uploadProgress.classList.remove('active');
-                    progressBar.style.width = '0%';
-                    resolve(downloadURL);
-                }
-            );
-        });
-    }
-
     // ===== ДОБАВЛЕНИЕ ИГРЫ =====
     submitGameBtn.addEventListener('click', async () => {
         if (!currentUser) {
@@ -1070,50 +978,39 @@
         const developer = gameDeveloper.value.trim();
         const genre = gameGenre.value.trim();
         const description = gameDescription.value.trim();
-        const mediaTypeValue = mediaType.value;
+        const url = mediaUrl.value.trim();
+        const type = mediaType.value;
 
         if (!title || !developer) {
             alert('Заполните название и разработчика!');
             return;
         }
 
-        if (!selectedFile) {
-            alert('Выберите файл (изображение или видео)!');
+        if (!url) {
+            alert('Введите ссылку на изображение или видео!');
             return;
         }
 
         try {
-            // Сначала создаём документ игры
-            const gameData = {
+            await addDoc(collection(db, 'games'), {
                 title,
                 developer,
                 genre: genre || 'Без жанра',
                 description,
-                mediaType: mediaTypeValue,
+                mediaType: type,
+                mediaUrl: url,
                 status: 'pending',
                 isGameOfWeek: false,
                 submittedBy: currentUser.email,
-                submittedAt: new Date().toISOString(),
-                mediaUrl: null
-            };
-
-            const docRef = await addDoc(collection(db, 'games'), gameData);
-            const gameId = docRef.id;
-
-            // Загружаем файл
-            const mediaUrl = await uploadFile(gameId);
-            
-            // Обновляем документ с URL
-            await updateDoc(doc(db, 'games', gameId), { mediaUrl });
+                submittedAt: new Date().toISOString()
+            });
 
             alert('✅ Игра отправлена на проверку!');
             gameTitle.value = '';
             gameDeveloper.value = '';
             gameGenre.value = '';
             gameDescription.value = '';
-            selectedFile = null;
-            gameFile.value = '';
-            fileList.innerHTML = '';
+            mediaUrl.value = '';
             loadGames();
             hideError();
         } catch (error) {
@@ -1125,10 +1022,12 @@
 
     // ===== ОБРАБОТЧИКИ ДЕЙСТВИЙ =====
     document.addEventListener('click', async (e) => {
+        const id = e.target.dataset.id;
+        if (!id) return;
+
         if (e.target.classList.contains('btn-approve')) {
-            const gameId = e.target.dataset.id;
             try {
-                await updateDoc(doc(db, 'games', gameId), { status: 'approved' });
+                await updateDoc(doc(db, 'games', id), { status: 'approved' });
                 loadGames();
             } catch (err) {
                 showError('Ошибка одобрения: ' + err.message);
@@ -1136,9 +1035,8 @@
         }
 
         if (e.target.classList.contains('btn-reject')) {
-            const gameId = e.target.dataset.id;
             try {
-                await updateDoc(doc(db, 'games', gameId), { status: 'rejected' });
+                await updateDoc(doc(db, 'games', id), { status: 'rejected' });
                 loadGames();
             } catch (err) {
                 showError('Ошибка отклонения: ' + err.message);
@@ -1146,7 +1044,6 @@
         }
 
         if (e.target.classList.contains('btn-game-week')) {
-            const gameId = e.target.dataset.id;
             try {
                 const gamesRef = collection(db, 'games');
                 const q = query(gamesRef, where('isGameOfWeek', '==', true));
@@ -1154,7 +1051,7 @@
                 for (const doc of snapshot.docs) {
                     await updateDoc(doc.ref, { isGameOfWeek: false });
                 }
-                await updateDoc(doc(db, 'games', gameId), { isGameOfWeek: true });
+                await updateDoc(doc(db, 'games', id), { isGameOfWeek: true });
                 loadGames();
             } catch (err) {
                 showError('Ошибка назначения игры недели: ' + err.message);
@@ -1293,7 +1190,8 @@
 
     console.log('🚀 PulsarGames загружен!');
     console.log('👑 Главарь: voyager4vodorod@gmail.com');
-    console.log('📸 Теперь можно загружать изображения и видео!');
+    console.log('📸 Теперь можно загружать изображения и видео по ссылкам!');
+    console.log('📌 Добавлены демо-игры для теста');
 </script>
 
 </body>
